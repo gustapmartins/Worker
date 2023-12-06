@@ -1,19 +1,12 @@
-﻿namespace Worker.Model;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Worker.Model;
 
 public class Show
 {
-    public Show () { }
-
-    public Show (int id, string name, string description, DateTime date, string local, Category? categorty)
-    {
-        Id = id;
-        Name = name;
-        Description = description;
-        Date = date;
-        Local = local;
-        Categorty = categorty;
-    }
-
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     public string Name { get; set; }
@@ -24,5 +17,5 @@ public class Show
 
     public string Local { get; set; }
 
-    public virtual Category? Categorty { get; set; }
+    public virtual Category? Category { get; set; }
 }

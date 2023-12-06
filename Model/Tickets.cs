@@ -3,13 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Worker.Model;
 
-public  class Category
+public class Tickets
 {
+
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public string Name { get; set; }
+    public int QuantityTickets { get; set; }
 
-    public string Description { get; set; }
+    public decimal Price { get; set; }
+
+    public virtual Show? Show { get; set; }
 }
