@@ -11,7 +11,8 @@ public class Cart
 
     public virtual List<CartItem> CartList { get; set; }
 
+    public virtual Users Users { get; set; }
+
     public decimal TotalPrice { get; set; }
 
-    public virtual Users Users { get; set; }
 }

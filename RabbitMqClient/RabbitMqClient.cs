@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client.Events;
+﻿using RabbitMQ.Client.Events;
 using Worker.Interface;
 using RabbitMQ.Client;
 using System.Text;
@@ -74,29 +73,8 @@ public class RabbitMqClient: RabbitMqBase
     {
         try
         {
-            Cart findCart = _dbContext.Carts.FirstOrDefault(t => t.Id == cart.Id)!;
+            Users findUser = _dbContext.Users.FirstOrDefault(t => t.Email == cart.Users.Email)!;
 
-            Users findUser = _dbContext.Users.FirstOrDefault(t => t.Email == findCart.Users.Email)!;
-
-            //Tickets ticket = new()
-            //{
-            //    Price = findTicket.Price,
-            //    QuantityTickets = findTicket.QuantityTickets,
-            //    Show = new()
-            //    {
-            //        Name = findTicket.Show!.Name,
-            //        Local = findTicket.Show!.Local,
-            //        Date = findTicket.Show!.Date,
-            //        Description = findTicket.Show!.Description,
-            //        Category = new()
-            //        {
-            //            Name = findTicket.Show.Category!.Name,
-            //            Description = findTicket.Show.Category!.Description,
-            //        }
-            //    }
-            //};
-
-            findUser.CartTickets.Add(findCart!);
             _dbContext.SaveChanges();
             Console.WriteLine("Dados salvos no banco de dados com sucesso!");
         }

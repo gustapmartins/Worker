@@ -7,8 +7,7 @@ public class Tickets
 {
 
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     public int QuantityTickets { get; set; }
 
