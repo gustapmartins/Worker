@@ -5,7 +5,6 @@ using RabbitMQ.Client;
 using System.Text;
 using Worker.Model;
 using Worker.Data;
-using Worker.DTO;
 
 namespace Worker.RabbitMqClient;
 
@@ -47,9 +46,9 @@ public class RabbitMqClient: RabbitMqBase
 
                 var message = Encoding.UTF8.GetString(body);
 
-                var result = _convert.DeserializeMessage<BuyTicketDto>(message);
+                var result = _convert.DeserializeMessage<Cart>(message);
 
-                Console.WriteLine($"{result.TicketId}| {result.Email} | {result.QuantityTickets}");
+                Console.WriteLine($"idCart:{result.Id} | totalPrice:{result.TotalPrice} | UsersId:{result.Users.Id}");
 
                 SaveToDatabase(result);
 
@@ -71,36 +70,33 @@ public class RabbitMqClient: RabbitMqBase
         Console.ReadLine();
     }
 
-    private void SaveToDatabase(BuyTicketDto buyTicket)
+    private void SaveToDatabase(Cart cart)
     {
         try
         {
-            Tickets findTicket = _dbContext.Tickets
-            .Include(t => t.Show)
-                .ThenInclude(s => s.Category)
-            .FirstOrDefault(t => t.Id == buyTicket.TicketId)!;
+            Cart findCart = _dbContext.Carts.FirstOrDefault(t => t.Id == cart.Id)!;
 
-            Users findUser = _dbContext.Users.Include(t => t.Tickets).FirstOrDefault(t => t.Email == buyTicket.Email)!;
+            Users findUser = _dbContext.Users.FirstOrDefault(t => t.Email == findCart.Users.Email)!;
 
-            Tickets ticket = new()
-            {
-                Price = findTicket.Price,
-                QuantityTickets = findTicket.QuantityTickets,
-                Show = new()
-                {
-                    Name = findTicket.Show!.Name,
-                    Local = findTicket.Show!.Local,
-                    Date = findTicket.Show!.Date,
-                    Description = findTicket.Show!.Description,
-                    Category = new()
-                    {
-                        Name = findTicket.Show.Category!.Name,
-                        Description = findTicket.Show.Category!.Description,
-                    }
-                }
-            };
+            //Tickets ticket = new()
+            //{
+            //    Price = findTicket.Price,
+            //    QuantityTickets = findTicket.QuantityTickets,
+            //    Show = new()
+            //    {
+            //        Name = findTicket.Show!.Name,
+            //        Local = findTicket.Show!.Local,
+            //        Date = findTicket.Show!.Date,
+            //        Description = findTicket.Show!.Description,
+            //        Category = new()
+            //        {
+            //            Name = findTicket.Show.Category!.Name,
+            //            Description = findTicket.Show.Category!.Description,
+            //        }
+            //    }
+            //};
 
-            findUser.Tickets.Add(findTicket!);
+            findUser.CartTickets.Add(findCart!);
             _dbContext.SaveChanges();
             Console.WriteLine("Dados salvos no banco de dados com sucesso!");
         }
