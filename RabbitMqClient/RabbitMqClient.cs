@@ -1,9 +1,11 @@
-﻿using RabbitMQ.Client.Events;
+﻿using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client.Events;
 using Worker.Interface;
 using RabbitMQ.Client;
-using System.Text;
 using Worker.Model;
 using Worker.Data;
+using Worker.Enum;
+using System.Text;
 
 namespace Worker.RabbitMqClient;
 
@@ -45,12 +47,10 @@ public class RabbitMqClient: RabbitMqBase
 
                 var message = Encoding.UTF8.GetString(body);
 
-                var result = _convert.DeserializeMessage<Cart>(message);
-
-                Console.WriteLine($"idCart:{result.Id} | totalPrice:{result.TotalPrice} | UsersId:{result.Users.Id}");
+                var result = _convert.DeserializeMessage<Carts>(message);
 
                 SaveToDatabase(result);
-
+               
                 _channel.BasicAck(ea.DeliveryTag, false);
             }
             catch
@@ -69,14 +69,23 @@ public class RabbitMqClient: RabbitMqBase
         Console.ReadLine();
     }
 
-    private void SaveToDatabase(Cart cart)
+    private void SaveToDatabase(Carts cart)
     {
         try
         {
-            Users findUser = _dbContext.Users.FirstOrDefault(t => t.Email == cart.Users.Email)!;
 
-            _dbContext.SaveChanges();
-            Console.WriteLine("Dados salvos no banco de dados com sucesso!");
+            Carts cartExist = _convert.HandleErrorAsync(() => 
+                _dbContext.Carts.Include(c => c.CartList).Include(t => t.Users).FirstOrDefault(s => s.Id == cart.Id))!;
+
+            foreach (var CartItem in cartExist.CartList)
+            {
+                if (CartItem.statusPayment == StatusPayment.Pedding)
+                {
+                    CartItem.statusPayment = StatusPayment.Aproved;
+                    _dbContext.SaveChanges();
+                    Console.WriteLine("Dados salvos no banco de dados com sucesso!");
+                }
+            }
         }
         catch (Exception ex)
         {

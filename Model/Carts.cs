@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Worker.Enum;
 
 namespace Worker.Model;
 
-public class Cart
+public class Carts
+
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,5 +16,4 @@ public class Cart
     public virtual Users Users { get; set; }
 
     public decimal TotalPrice { get; set; }
-
 }
